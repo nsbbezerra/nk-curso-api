@@ -16,12 +16,10 @@ export class Subscribe {
       const findDup = await subscribe.findOne({ cpf });
 
       if (findDup) {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Este CPF já possui uma inscrição, clique em MINHA INSCRIÇÃO para ver os detalhes",
-          });
+        return res.status(400).json({
+          message:
+            "Este CPF já possui uma inscrição, clique em MINHA INSCRIÇÃO para ver os detalhes",
+        });
       }
 
       const mySub = await subscribe.create({
@@ -35,11 +33,14 @@ export class Subscribe {
         status: "wait",
       });
 
+      let webhookUrl = configs.webhook;
+      let productionUrl = `${configs.url_production}/confirm/${mySub.identify}`;
+
       let preference = {
         external_reference: mySub.identify,
         notification_url: `${
-          configs.ambient === "dev" ? configs.webhook : configs.url_production
-        }/confirm/${mySub.identify}`,
+          configs.ambient === "dev" ? webhookUrl : productionUrl
+        }`,
         items: [
           {
             title: `Curso de Programação de sites - NK Informática`,
@@ -86,11 +87,14 @@ export class Subscribe {
     const { id } = req.params;
 
     try {
+      let webhookUrl = configs.webhook;
+      let productionUrl = `${configs.url_production}/confirm/${id}`;
+
       let preference = {
         external_reference: id,
         notification_url: `${
-          configs.ambient === "dev" ? configs.webhook : configs.url_production
-        }/confirm/${id}`,
+          configs.ambient === "dev" ? webhookUrl : productionUrl
+        }`,
         items: [
           {
             title: `Curso de Programação de sites - NK Informática`,
@@ -220,6 +224,19 @@ export class Subscribe {
     try {
       const subscribes = await subscribe.find();
       return res.status(200).json(subscribes);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async Update(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    const { status } = req.body;
+    try {
+      await subscribe.findOneAndUpdate({ identify: id }, { status });
+
+      return res
+        .status(200)
+        .json({ message: "Inscrição alterada com sucesso" });
     } catch (error) {
       next(error);
     }

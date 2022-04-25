@@ -11,5 +11,6 @@ router.get("/find_subscribe/:cpf", SubscribeClass.FindSubscribe);
 router.put("/validade", SubscribeClass.ValidateSubscribe);
 router.post("/confirm/:id", SubscribeClass.WebHook);
 router.get("/list", SubscribeClass.List);
+router.put("/update/:id", SubscribeClass.Update);
 
 export { router };
