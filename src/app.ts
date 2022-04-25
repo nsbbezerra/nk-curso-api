@@ -12,7 +12,6 @@ app.use(cors());
 app.use(express.json());
 app.use(router);
 app.use((error: HTTPError, req: Request, res: Response, next: NextFunction) => {
-  console.log(error);
   const errorMessage = error.message;
   return res.status(400).json({
     message: "Ocorreu um erro ao realizar a operação",
